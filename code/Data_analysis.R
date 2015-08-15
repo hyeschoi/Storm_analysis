@@ -1,0 +1,386 @@
+##----------------------------------------------------------------------------------------------
+#   Header
+##----------------------------------------------------------------------------------------------
+# Author : Hye Soo Choi
+# Date: August 13, 2015
+# Description: This part consists on analyzing data of the North Atlantic Basin 
+#   for the period between 1980 - 2010. will navigate storms' behavior by observing
+#   frequency table and plot of number of storms per year and per month, 
+#   applying linear regression to see a pattern between pressure and wind speed.
+#   
+#
+##----------------------------------------------------------------------------------------------
+#   Packages
+##----------------------------------------------------------------------------------------------
+
+library(readr)
+library(ggplot2)
+library(dplyr)
+
+##----------------------------------------------------------------------------------------------
+#   Data import
+##----------------------------------------------------------------------------------------------
+
+storms <- read_csv('./data/storms.csv')
+tracks <- read_csv('./data/tracks.csv')
+
+# Coerce date into Date class for future use
+storms$date <- as.Date(storms$date, format = '%m/%d/%Y')
+tracks$date <- as.Date(tracks$date, format = '%m/%d/%Y')
+
+
+# Filter two data frames with year in between 1980 and 2010
+storms <- storms %>% filter (format(date, format = '%Y') >= 1980 & 
+                               format(date, format = '%Y') <= 2010)
+tracks <- tracks %>% filter (format(date, format = '%Y') >= 1980 & 
+                               format(date, format = '%Y') <= 2010)
+
+##----------------------------------------------------------------------------------------------
+#   Frequency table and Barplot
+##----------------------------------------------------------------------------------------------
+
+# Obtain frequencies and barplot for number of storms per YEAR
+freq.year <- storms %>%  group_by(format( date, format = '%Y')) %>% summarise( count = n()) 
+names(freq.year) <- c('year', 'count')
+freq.year
+
+# Save plot in PDF and PNG
+pdf('./images/storm_year.pdf')
+ggplot(freq.year, aes (x = year, y = count)) + geom_bar(stat = 'identity') +
+  theme(text = element_text(size = 11),
+        axis.text.x = element_text(angle = 90),
+        plot.title=element_text(size = 15)) +
+  ggtitle('Number of Storms per Year') + xlab('Year')
+dev.off()
+
+png('./images/storm_year.png', width = 480, height = 480)
+ggplot(freq.year, aes (x = year, y = count)) + geom_bar(stat = 'identity') +
+  theme(text = element_text(size = 11),
+        axis.text.x = element_text(angle = 90),
+        plot.title=element_text(size = 15)) +
+  ggtitle('Number of Storms per Year') + xlab('Year')
+dev.off()
+
+
+# maximum of wind speed for each storm
+max.wind <- tracks %>% group_by( id ) %>% summarise( max.wind = max(wind))
+
+
+# id of the storms with max wind speed >= 35 knots
+id35 <- max.wind$id[ max.wind$max.wind >= 35]
+
+# Obtain frequency table and barplot for 
+# number of storms per year with max wind speed >= 35 knots
+freq.year.35 <- storms %>% filter(id %in% id35) %>% group_by(format(date, format = '%Y')) %>% tally()
+names(freq.year.35) <- c('year', 'count')
+freq.year.35
+
+# Save plot in PDF and in PNG
+pdf('./images/wind35_year.pdf')
+ggplot(freq.year.35 , aes (x = year, y = count)) + geom_bar( stat = 'identity') +
+  theme(text = element_text(size = 11),
+        axis.text.x = element_text(angle = 90),
+        plot.title=element_text(size = 15)) +
+  ggtitle('Number of Storms with winds >= 35 knots per Year') + xlab('Year')
+dev.off()
+
+png('./images/wind35_year.png', width = 480, height = 480)
+ggplot(freq.year.35 , aes (x = year, y = count)) + geom_bar( stat = 'identity') +
+  theme(text = element_text(size = 11),
+        axis.text.x = element_text(angle = 90),
+        plot.title=element_text(size = 15)) +
+  ggtitle('Number of Storms with winds >= 35 knots per Year') + xlab('Year')
+dev.off()
+
+# id of the storms with max wind speed >= 64 knots
+id64 <- max.wind$id[max.wind$max.wind >= 64]
+
+# Obtain frequency table and barplot for
+# Number of storms per year with max wind speed >= 64 knots
+freq.year.64 <- storms %>%filter(id %in% id64) %>% group_by(format(date, format = '%Y')) %>% tally()
+names(freq.year.64) <- c('year', 'count')
+freq.year.64
+
+# Save plot in PDF and in PNG
+pdf('./images/wind64_year.pdf')
+ggplot(freq.year.64 , aes (x = year, y = count)) + geom_bar( stat = 'identity') +
+  theme(text = element_text(size = 11),
+        axis.text.x = element_text(angle = 90),
+        plot.title=element_text(size = 15)) +
+  ggtitle('Number of Storms with winds >= 64 knots per Year') + xlab('Year')
+dev.off()
+
+png('./images/wind64_year.png', width = 480, height = 480)
+ggplot(freq.year.64 , aes (x = year, y = count)) + geom_bar( stat = 'identity') +
+  theme(text = element_text(size = 11),
+        axis.text.x = element_text(angle = 90),
+        plot.title=element_text(size = 15)) +
+  ggtitle('Number of Storms with winds >= 64 knots per Year') + xlab('Year')
+dev.off()
+
+
+# id of the storms with max wind speed >= 96 knots
+id96 <- max.wind$id[max.wind$max.wind >= 96]
+
+# Obtain frequency table and barplot for
+# number of storms per year with max wind speed >= 96 knots
+freq.year.96 <- storms %>% filter(id %in% id96) %>% group_by(format(date, format = '%Y')) %>% tally()
+names(freq.year.96) <- c('year', 'count')
+freq.year.96
+
+# Save plot in PDF and in PNG
+pdf('./images/wind96_year.pdf')
+ggplot(freq.year.96 , aes (x = year, y = count)) + geom_bar( stat = 'identity') +
+  theme(text = element_text(size = 11),
+        axis.text.x = element_text(angle = 90),
+        plot.title = element_text(size = 15)) +
+  ggtitle('Number of Storms with winds >= 96 knots per Year') + xlab('Year')
+dev.off()
+
+png('./images/wind96_year.png', width = 480, height = 480)
+ggplot(freq.year.96 , aes (x = year, y = count)) + geom_bar( stat = 'identity') +
+  theme(text = element_text(size = 11),
+        axis.text.x = element_text(angle = 90),
+        plot.title = element_text(size = 15)) +
+  ggtitle('Number of Storms with winds >= 96 knots per Year') + xlab('Year')
+dev.off()
+
+
+# Obtain frequency table and barplot for
+# number of storms per MONTH
+freq.month <- storms %>% group_by(format(date, format = '%m')) %>% tally()
+names(freq.month) <- c('month', 'count')
+freq.month
+
+# Save plot in PDF and in PNG 
+pdf('./images/storm_month.pdf')
+ggplot(freq.month , aes (x = month, y = count)) + geom_bar( stat = 'identity') +
+  ggtitle('Number of Storms per Month') + xlab('Month')
+dev.off()
+
+png('./images/storm_month.png')
+ggplot(freq.month , aes (x = month, y = count)) + geom_bar( stat = 'identity') +
+  ggtitle('Number of Storms per Month') + xlab('Month')
+dev.off()
+
+
+
+# Obtain frequencies and barplot for
+# number of storms per month with max wind speed >= 35 knots
+freq.month.35 <- storms %>% filter(id %in% id35) %>% group_by(format(date, format = '%m')) %>% tally()
+names(freq.month.35) <- c('month', 'count')
+freq.month.35
+
+
+# Save plot in PDF and in PNG
+pdf('./images/wind35_month.pdf')
+ggplot(freq.month.35 , aes (x = month, y = count)) + geom_bar( stat = 'identity') +
+  ggtitle('Number of Storms with Wind Speed >= 35 per Month') + xlab('Month')
+dev.off()
+
+png('./images/wind35_month.png')
+ggplot(freq.month.35 , aes (x = month, y = count)) + geom_bar( stat = 'identity') +
+  ggtitle('Number of Storms with Wind Speed >= 35 per Month') + xlab('Month')
+dev.off()
+
+
+
+# Obtain frequency table and barplot for
+# number of storms per month with max wind speed >= 64 knots
+freq.month.64 <- storms %>% filter(id %in% id64) %>% group_by(format(date, format = '%m')) %>% tally()
+names(freq.month.64) <- c('month', 'count')
+freq.month.64
+
+# Save plot in PDF and in PNG
+pdf('./images/wind64_month.pdf')
+ggplot(freq.month.64 , aes (x = month, y = count)) + geom_bar( stat = 'identity') +
+  ggtitle('Number of Storms with Wind Speed >= 64 per Month') + xlab('Month')
+dev.off()
+
+png('./images/wind64_month.png')
+ggplot(freq.month.64 , aes (x = month, y = count)) + geom_bar( stat = 'identity') +
+  ggtitle('Number of Storms with Wind Speed >= 64 per Month') + xlab('Month')
+dev.off()
+
+
+# Obtain frequency table and barplot for
+# number of storms per year with max wind speed >= 96 knots
+freq.month.96 <- storms %>% filter(id %in% id96) %>% group_by(format(date, format = '%m')) %>% tally()
+names(freq.month.96) <- c('month', 'count')
+freq.month.96
+
+# Save plot in PDF and PNG
+pdf('./images/wind96_month.pdf')
+ggplot(freq.month.96 , aes (x = month, y = count)) + geom_bar( stat = 'identity') +
+  ggtitle('Number of Storms with Wind Speed >= 96 per Month') + xlab('Month')
+dev.off()
+
+png('./images/wind96_month.png')
+ggplot(freq.month.96 , aes (x = month, y = count)) + geom_bar( stat = 'identity') +
+  ggtitle('Number of Storms with Wind Speed >= 96 per Month') + xlab('Month')
+dev.off()
+
+##----------------------------------------------------------------------------------------------
+#   Summary statistics
+##----------------------------------------------------------------------------------------------
+
+# Observe summary statistics of annual average mean number of storms 
+# with maximum wind speed at least 35 knots
+
+# average 
+freq.year.35 %>% summarise(mean(count))
+
+# standard deviation
+freq.year.35 %>% summarise(sd(count))
+
+# 25th percentile
+quantile(freq.year.35$count, probs = 0.25)
+
+
+# 50th percentile
+quantile(freq.year.35$count, probs = 0.5)
+
+
+# 75th percentile
+quantile(freq.year.35$count, probs = 0.75)
+
+
+# Obeserve summary statistics of Annual average mean number of storms 
+# with maximum winds at least 64 knots
+
+# average 
+mean(freq.year.64$count)
+
+
+# standard deviation
+sd(freq.year.64$count)
+
+
+# 25th percentile
+quantile(freq.year.64$count, probs = 0.25)
+
+
+# 50th percentile
+quantile(freq.year.64$count, probs = 0.5)
+
+
+# 75th percentile
+quantile(freq.year.64$count, probs = 0.75)
+
+
+# Observe summary statistics of annual average mean number of storms 
+# with maximum winds of at least 96 knots
+
+# average 
+mean(freq.year.96$count)
+
+# standard deviation
+sd(freq.year.96$count)
+
+# 25th percentile
+quantile(freq.year.96$count, probs = 0.25)
+
+# 50th percentile
+quantile(freq.year.96$count, probs = 0.5)
+
+# 75th percentile
+quantile(freq.year.96$count, probs = 0.75)
+
+##----------------------------------------------------------------------------------------------
+#   Regression
+##----------------------------------------------------------------------------------------------
+# Regression analysis 1: mean pressure and mean wind speed for each storm 
+# (without observations with mean pressure = 0)
+
+# mean pressure for each storm
+mean.press <- tracks %>% group_by(id) %>% summarise( mean(press) )
+names(mean.press) <- c('id','mean.press')
+
+# mean wind speed for each storm
+mean.wind <- tracks %>% group_by(id) %>% summarise(mean(wind))
+names(mean.wind) <- c('id','mean.wind')
+
+# merge two mean vectors into a data frame
+mean.pw <- inner_join(mean.press, mean.wind)
+
+# get rid of storms whose mean pressure = 0
+mean.pw <- mean.pw %>% filter(mean.press > 0)
+
+
+# Regression analysis 2: median pressure and median wind speed for each storm 
+# (without observations with median pressure = 0)
+
+# median pressure for each storm
+median.press <- tapply(tracks$press, tracks$id, median)
+
+# median wind speed for each storm
+median.wind <- tapply(tracks$wind, tracks$id, median)
+
+# merge two median vectors into a data frame
+median.pw <- as.data.frame(cbind(unique(tracks$id), median.press, median.wind))
+
+# remove storms whose median pressure = 0
+median.pw <- subset(median.pw, median.press > 0)
+
+
+# Draw a plot for each regression line 
+
+
+# Save regression graph on median in PDF and in PNG
+pdf("./images/regression_median_pw.pdf")
+ggplot(median.pw, aes(x = median.press, y = median.wind)) + 
+  geom_point() + 
+  geom_smooth(method = lm, se = FALSE) + 
+  ggtitle ('Median of Wind speed and Pressure per Storm') +
+  ylab('Pressure (mb)') + 
+  xlab('Wind speed (knots)')
+dev.off()
+
+png("./images/regression_median_pw.png")
+ggplot(median.pw, aes(x = median.wind, y = median.press)) + 
+  geom_point() + 
+  geom_smooth(method = lm, se = FALSE) + 
+  ggtitle ('Median of Wind speed and Pressure for Storms') +
+  ylab('Pressure (mb)') + 
+  xlab('Wind speed (knots)')
+dev.off()
+
+
+# Save regression graph on mean in PDF and in PNG
+pdf('./images/regression_mean_pw.pdf')
+ggplot(mean.pw, aes(x = mean.wind, y = mean.press)) + 
+  geom_point() + 
+  geom_smooth(method = lm, se = FALSE) + 
+  ggtitle ('Mean of Wind speed and Pressure for Storms') +
+  ylab('Pressure (mb)') + 
+  xlab('Wind speed (knots)')
+dev.off()
+
+png('./images/regression_mean_pw.png')
+ggplot(mean.pw, aes(x = mean.wind, y = mean.press)) + 
+  geom_point() + 
+  geom_smooth(method = lm, se = FALSE) + 
+  ggtitle ('Mean of Wind speed and Pressure for Storms') +
+  ylab('Pressure (mb)') + 
+  xlab('Wind speed (knots)')
+dev.off()
+
+##----------------------------------------------------------------------------------------------
+#   Save
+##----------------------------------------------------------------------------------------------
+
+# Merge all freq.month table
+temp <- merge(freq.month, freq.month.35, by = 'month', all = TRUE)
+temp <- merge(temp, freq.month.64, by = 'month', all = TRUE)
+freq.month.df <- merge(temp, freq.month.96, by = 'month', all = TRUE)
+colnames(freq.month.df) <- c('month','count', 'count.35', 'count.64', 'count.96')
+
+# Merge all freq.year table
+temp <- merge(freq.year, freq.year.35, by = 'year', all = TRUE)
+temp <- merge(temp, freq.year.64, by = 'year', all = TRUE)
+freq.year.df <- merge(temp, freq.year.96, by = 'year', all = TRUE)
+colnames(freq.year.df) <- c('month','count', 'count.35', 'count.64', 'count.96')
+
+# Save tables as csv files
+write_csv(freq.month.df, './data/freq_month.csv')
+write_csv(freq.year.df, './data/freq_year.csv')

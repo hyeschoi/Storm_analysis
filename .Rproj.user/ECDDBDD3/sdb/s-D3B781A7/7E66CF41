@@ -1,0 +1,18 @@
+{
+    "contents" : "\n\n##----------------------------------------------------------------------------------------------\n# Header\n##----------------------------------------------------------------------------------------------\n\n# The file skeleton.R is an R script with the commands \n# to create the directories and the README.md file.\n# This file also contains the commands \n# to download the raw data files to the corresponding directory.\n\n# Any resource files downloaded in resources folder, \n# skeleton.R  will also have the commands to download such information.\n\n\n##----------------------------------------------------------------------------------------------\n# Create the directories within package\n##----------------------------------------------------------------------------------------------\n\ndir.create('./code')\ndir.create('./rawdata')\ndir.create('./data')\ndir.create('./resources')\ndir.create('./report')\ndir.create('./images')\nfile.create('./README.md')\n\n\n##----------------------------------------------------------------------------------------------\n# Download rawdata\n##----------------------------------------------------------------------------------------------\n# we downlaods hdat file from \n# 'ftp://eclipse.ncdc.noaa.gov/pub/ibtracs/v03r06/wmo/hurdat_format/basin/Basin.NA.ibtracs_hurdat.v03r06.hdat'\n# and save it as a local file in 'rawdata' folder\n\n# This rawdata contains contains storm record for the North Atlantic basin\n\ndownload.file('ftp://eclipse.ncdc.noaa.gov/pub/ibtracs/v03r06/wmo/hurdat_format/basin/Basin.NA.ibtracs_hurdat.v03r06.hdat\n              ', './rawdata/Basin.NA.ibtracs_hurdat.v03r06.hdat' )\n\n\n\n\n\n\n",
+    "created" : 1438888394686.000,
+    "dirty" : true,
+    "encoding" : "UTF-8",
+    "folds" : "",
+    "hash" : "3866920500",
+    "id" : "7E66CF41",
+    "lastKnownWriteTime" : 1438891342,
+    "path" : "~/Desktop/Summer2015/Final_project/skeleton.R",
+    "project_path" : "skeleton.R",
+    "properties" : {
+        "tempName" : "Untitled1"
+    },
+    "relative_order" : 3,
+    "source_on_save" : false,
+    "type" : "r_source"
+}

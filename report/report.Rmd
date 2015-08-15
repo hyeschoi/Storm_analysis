@@ -1,0 +1,234 @@
+---
+title: "Final Project Report"
+author: "Hye Soo Choi"
+date: "August 14, 2015"
+header-includes: \usepackage{graphicx}
+                 \usepackage{float}
+output: 
+    pdf_document:
+        fig_caption: false
+---
+-----
+
+## Data source
+
+In this project, we analyzed the data about storms that hit North Atlantic(NA) and East Pacific(EP) from 1980 to 2010, in terms of location, wind speed, surface pressure, date of occurence, and duration. We used following storm data for these two basin :
+
+ - [(ftp://eclipse.ncdc.noaa.gov/pub/ibtracs/v03r06/wmo/hurdat_format/basin/Basin.NA.ibtracs_hurdat.v03r06.hdat)](ftp://eclipse.ncdc.noaa.gov/pub/ibtracs/v03r06/wmo/hurdat_format/basin/Basin.NA.ibtracs_hurdat.v03r06.hdat),
+ - [(ftp://eclipse.ncdc.noaa.gov/pub/ibtracs/v03r06/wmo/csv/basin/Basin.NA.ibtracs_wmo.v03r06.csv)](ftp://eclipse.ncdc.noaa.gov/pub/ibtracs/v03r06/wmo/csv/basin/Basin.NA.ibtracs_wmo.v03r06.csv),
+ - [(ftp://eclipse.ncdc.noaa.gov/pub/ibtracs/v03r06/wmo/csv/basin/Basin.EP.ibtracs_wmo.v03r06.csv)](ftp://eclipse.ncdc.noaa.gov/pub/ibtracs/v03r06/wmo/csv/basin/Basin.EP.ibtracs_wmo.v03r06.csv),
+
+
+which can be obtained at the __International Best Track Archive for Climate Stewardship (IBTrACS)__  [(ftp://eclipse.ncdc.noaa.gov/pub/ibtracs/v03r06/wmo/cxml/year)](ftp://eclipse.ncdc.noaa.gov/pub/ibtracs/v03r06/wmo/cxml/year). 
+
+-----
+
+## Data cleaning
+
+A cleaned data.frame, *storms*, was created by mainly using regular expressions to extract various pieces of data. After extracting the variables of interest and changing the variable formats, the final data include the following variables:
+
+ - id: storm id (e.g. 1)
+ - date: date (e.g. 11/13/2009)
+ - duration: duration in day (e.g. 3)
+ - name: name of the storm (ALLEN)
+
+A cleaned data.frame, *tracks*, was created by mainly using regular expressions to extract various pieces of data.
+After extracting the variables of interest and changing the variable formats, the final data include the following variables: 
+
+ - id: storm id (e.g. 1246)
+ - date: date (e.g. 07/18/1980)
+ - period: 00h, 06h, 12h, 18h (e.g. 00h)
+ - stage: type of stage (e.g. cyclone)
+ - lat: latitude (e.g. 30.5)
+ - long: longitude, negative for west (e.g. -76.5)
+ - wind: wind speed in knot (e.g. 25)
+ - press: surface pressure in mb (e.g. 1020)
+
+
+```{r echo = FALSE, message= FALSE}
+# necessary packages
+#library(xtable)
+library(readr)
+# library(sp)
+# library(gpclib)
+# library(ggplot2)
+# library(ggmap)
+# library(maptools)
+# library(maps)
+library(knitr)
+library(png)
+library(grid)
+```
+
+
+```{r ,echo = FALSE}
+
+storms <- read_csv('../data/storms.csv', col_names = TRUE)
+tracks <- read_csv('../data/tracks.csv', col_names = TRUE)
+```
+
+The following displays the first 6 observations in the storms and tracks data.
+
+```{r head, eval = TRUE}
+head(storms, 6)
+head(tracks, 6)
+```
+
+-----
+
+## Data analysis
+
+
+```{r eval = TRUE, echo = FALSE}
+
+freq.month.df <- read_csv('../data/freq_month.csv', col_names = TRUE)
+freq.year.df <- read_csv('../data/freq_year.csv')
+```
+
+The first exploratory analysis was performed with respect to the number of storms per year. More specifically, we conducted exploratory anayasis on the following variables.
+
+ - Number of storms per year
+ - Number of storms per year with wind speed >= 35 knots
+ - Number of storms per year with wind speed >= 64 knots
+ - Number of storms per year with wind speed >= 96 knots
+
+To understand the distribution, we produced barplot for each variable.
+
+
+```{r fig.width = 3, fig.height= 3, echo = FALSE}
+
+
+grid.raster(readPNG('../images/storm_year.png'))
+grid.newpage()
+grid.raster(readPNG('../images/wind35_year.png'))
+```
+
+```{r fig.width = 3, fig.height= 3, echo = FALSE }
+grid.raster(readPNG('../images/wind64_year.png'))
+grid.newpage()
+grid.raster(readPNG('../images/wind96_year.png'))
+
+```
+
+We can observe that storms were most frequent and violent in 2005.
+
+
+We also examine the descriptive statistics of the variables. 
+The following table presents the summary statistics of the four variables. 
+
+```{r echo = FALSE}
+summary.stat <-function(x){
+  c(mean(x, na.rm = TRUE), sd(x, na.rm = TRUE),
+   min(x, na.rm = TRUE), max(x, na.rm = TRUE),
+  quantile(x, probs = c(0.25, 0.5, 0.75), na.rm = TRUE))
+}
+  
+summary.year <- rbind(summary.stat(freq.year.df$count), summary.stat(freq.year.df$count.35),
+                      summary.stat(freq.year.df$count.64), summary.stat(freq.year.df$count.96))
+colnames(summary.year) <- c('mean','sd','min','max','25%','50%','75%')
+rownames(summary.year) <- c('  ', '>= 35', '>= 64','>= 96')
+kable(summary.year, caption = 'Summary Statistic of annual number of storms by wind speed')
+```
+
+----
+
+The second exploratory analysis was performed with respect to the number of storms per month. More specifically, we conducted exploratory anayasis on the following variables.
+
+ - Number of storms per month
+ - Number of storms per month with wind speed >= 35 knots
+ - Number of storms per month with wind speed >= 64 knots
+ - Number of storms per month with wind speed >= 96 knots
+
+The follwing table presents the number of storms per month.
+
+```{r  results='asis', echo = FALSE, message = FALSE}
+kable(freq.month.df, caption = 'Number of storms per month' )
+
+```
+
+To understand the distribution, we also produced barplot for each variable.
+
+
+```{r fig.width = 4, fig.height= 3, echo = FALSE}
+
+library(png)
+library(grid)
+grid.raster(readPNG('../images/storm_month.png'))
+grid.newpage()
+grid.raster(readPNG('../images/wind35_month.png'))
+```
+
+```{r fig.width = 4, fig.height= 3, echo = FALSE}
+grid.newpage()
+grid.raster(readPNG('../images/wind64_month.png'))
+grid.newpage()
+grid.raster(readPNG('../images/wind96_month.png'))
+```
+
+We can see that this graph is bell-shaped, and there has been most frequent and violent storms around september.
+
+------
+
+
+## Regression Analysis
+
+To estimate the relationship between wind speed and pressure for storms, we used linear regression. For each storm, mean(median) of wind speed and pressure is calculated and plotted, and then the linear regression line is drawn on the scatter plot of wind speed and pressure. To improve prediction accuracy, we removed storms whose mean(median) pressure is zero in our regression analysis.
+
+```{r fig.width = 4, fig.height= 3, echo = FALSE}
+grid.newpage()
+grid.raster(readPNG('../images/regression_mean_pw.png'))
+grid.newpage()
+grid.raster(readPNG('../images/regression_median_pw.png'))
+```
+
+Although more outliers are present, residual values seem to be smaller in the scattor plot of mean wind speed and mean pressure than in the scatter plot of median wind speed and median pressure. We can observe that wind speed and pressure has strong negative linear relationship in both scatter plots. 
+
+------
+
+## Visualization
+
+The third part of the project consists of visualizing the trajectory of the storms in both the East Pacific (EP) and the North Atlantic (NA) basins, for the period 1980-2010. 
+
+We produced a world map with spatial distribution of storm activity. The color of data points reflects storm intensity; the higher wind speed was, the darker blue a point is colored on the map.
+
+```{r fig.width = 7, fig.height = 6, echo = FALSE}
+grid.newpage()
+grid.raster(readPNG('../images/EPNAmap.png'))
+```
+
+To be more specific, we draw world map with spatial distribution of storms in different decades: 1980s, 1990s, 2000s.
+
+In 1980s, storm trajectories for each year is drawn as follows.
+
+```{r fig.width = 8, fig.height= 7, echo = FALSE}
+grid.newpage()
+grid.raster(readPNG('../images/EPNAmap_1980s.png'))
+```
+
+In 1990s, storm trajectories for each year is drawn as follows.
+
+```{r fig.width = 8, fig.height= 7, echo = FALSE}
+grid.newpage()
+grid.raster(readPNG('../images/EPNAmap_1990s.png'))
+```
+
+In 2000s, storm trajectories for each year is drawn as follows.
+
+```{r fig.width = 8, fig.height= 7, echo = FALSE}
+grid.newpage()
+grid.raster(readPNG('../images/EPNAmap_2000s.png'))
+```
+
+Although, the trajectories varies from year to year, We can see simlilar path of storms throughout decades:
+
+ - Across North Atalantic basin, storms generally move westward with a slight tend toward the north.
+ - Across East Pacific, storms generally move eastward with a slight tend toward the north.
+ - High wind speed, higher than 100 knots, usually occurs in latitude between 10° and 30°.
+
+We also produced the storm trajectories for each month.
+
+```{r fig.width = 7, fig.height= 7, echo = FALSE}
+grid.raster(readPNG('../images/EPNAmap_month.png'))
+```
+
+As shown from the barplot of number of storms per month, there has been most frequent and violent in September, and secondly in August. In January, Febraury, and March, storms rarely occurs.
